@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Imager;
+
+my $SCALE = 2;
+
+my @input = <>;
+
+exit unless @input;
+
+my $width = length($input[0]) - 1; # compensate for newline at end
+my $height = scalar(@input);
+my $image = Imager->new(xsize => $width * $SCALE, ysize => $height * $SCALE);
+
+my $white = Imager::Color->new( 0xFF, 0xFF, 0xFF );
+my $black = Imager::Color->new(    0,    0,    0 );
+
+my $y = 0;
+for my $line (@input) {
+    chomp $line;
+    my $x = 0;
+    for my $char (split '', $line) {
+        my $color = $char eq '#' ? $black : $white;
+        for my $dy (0 .. $SCALE-1) {
+            for my $dx (0 .. $SCALE-1) {
+                $image->setpixel( x => $x * $SCALE + $dx,
+                                  y => $y * $SCALE + $dy,
+                                  color => $color );
+            }
+        }
+        ++$x;
+    }
+    ++$y;
+}
+
+my $filename = 'test.png';
+$image->write( file => $filename )
+      or die "Cannot save $filename: ", $image->errstr;

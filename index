@@ -1,0 +1,7 @@
+1: Regular expressions; literals and anchors
+2: Character classes
+3: Quantifiers, alternations, conjunctions
+4: Captures, subrules, aliases
+5: The operator precedence parser
+6: Side effects: cuts, closures and actions
+7: Making it work: coroutines and continuations

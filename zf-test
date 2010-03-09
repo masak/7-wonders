@@ -1,0 +1,42 @@
+use v6;
+
+use Zf::Image;
+use Zf::Text;
+use Zf::Box;
+use Zf::Arrow;
+use Zf::Row;
+
+use Zf::to::Pixels;
+
+my $image = Zf::Image.new(
+    :child( Zf::Row.new(
+        :children( [
+            Zf::Arrow.new(
+                :above( Zf::Text.new( :string('Program') ) ),
+                :below( Zf::Text.new( :string('Language A') ) )
+            ),
+            Zf::Box.new(
+                :child( Zf::Text.new(
+                    :string('Compiler')
+                ))
+            ),
+            Zf::Arrow.new(
+                :above( Zf::Text.new( :string('Program') ) ),
+                :below( Zf::Text.new( :string('Language B') ) )
+            ),
+        ].list )
+    ))
+);
+
+# my $image = Zf::Image.new(
+#     :child( Zf::Arrow.new(
+#         :above( Zf::Text.new(
+#             :string('Program')
+#         )),
+#         :below( Zf::Text.new(
+#             :string('Language A')
+#         ))
+#     ))
+# );
+
+.render given Zf::to::Pixels.new(:$image);

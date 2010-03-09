@@ -1,0 +1,285 @@
+=for history
+The Hanging Gardens of Babylon, also known as the Hanging Gardens of Semiramis,
+near present-day Al Hillah, Babil in Iraq, are considered to be one of the
+original Seven Wonders of the Ancient World. They were built by the Chaldean
+king Nebuchadnezzar II around 600 BC. He is reported to have constructed the
+gardens to please his homesick wife, Amytis of Media, who longed for the trees
+and fragrant plants of her homeland Persia. The gardens were destroyed by
+several earthquakes after the 2nd century BC. [...] There is some controversy
+as to whether the Hanging Gardens were an actual creation or a poetic creation
+due to the lack of documentation of them in the chronicles of Babylonian
+history.
+
+=head0 Character classes
+
+=head1 Your robot and you
+
+Picture yourself in the distant future, maybe even on a different planet.
+The C<profession> field of your ID holocard says 'cook'; even in the future,
+people prefer to combine fine ingredients into splendid taste sensations,
+or to employ a person who does it for them. One can't really trust a robot
+with the minute culinary decisions involved in preparing an unforgettable meal.
+So you keep telling yourself, anyway.
+
+You do have the most advanced machinery on the market to help you in the
+kitchen, of course. Including, as it happens, a robot. One can't really
+avoid having one, the atmosphere being toxic and all. The robot takes care
+of doing tasks that require going outside, such as acquiring ingredients.
+Ingredients form a vital part of cooking.
+
+The robot accepts input through a keyboard. (In this futuristic scenario,
+researchers gave up on speech recognition, because the state-of-the-art
+technology never evolved beyond the ability to distinguish between such words
+as "talk", "took", "torque", "Turk" and "toke"; in the end, the researchers
+couldn't determine whether they had simply set their goals too high to begin
+with, or whether the machines just felt like messing with them. So keyboards
+remained the dominant technology.) One enters the instructions for which
+groceries to pick up through a very specialized "Delivery-Specific Language",
+one which you at one point spent a three-day course mastering. It looks like
+this:
+
+    <[ r p q ]>
+
+That one says "pick up B<r>ice or B<p>asta or B<q>uinoa" (either one of them
+works fine). The robot goes out and gets one of those for you, whichever
+it finds first.
+
+Now, if it always came down to specifying a few things with that simple syntax,
+the robot wouldn't really deserve to be called futuristic. But it also comes
+with a few really nice shorthands. For example, you could as well have
+written the above instruction as:
+
+    <[ p..r ]>
+
+(Since C<p>, C<q> and C<r> follow each other alphabetically.) Or, say you
+just wanted to buy something in the C<a..m> range, I<except> for fish or
+eels, which also happen to be toxic (to humans) on this planet:
+
+    <[a..m] - [fe]>
+
+The robot obliges and comes back with any of the groceries in the C<a..m>
+range, but it makes sure not to pick a fish or an eel. In fact, if your only
+concern is not getting the fish or the eel (as they carefully explained in
+the three-day course), you can give the following instruction to the robot:
+
+    <-[fe]>
+
+In English, that means "pick up absolutely *any* grocery, except fishes or
+eels".
+
+Conversely, if you want to specify a larger number of inclusions and
+exclusions, that's fine too:
+
+    <[a..m] - [fe] + [p..r]>
+
+And, in fact, you can even start off with a C<+> if you like the symmetry of
+it -- though it doesn't add anything semantically:
+
+    <+[a..m] - [fe] + [p..r]>
+
+Thus works your groceries robot. To be honest, you've always felt a little
+bit of roboticist in you, and more than once have you wondered at the workings
+below that shiny panel, thought about what structures must exist inside the
+mechanical assistant in order for it to do its job: go to the market with
+your coded instructions, and arrive back (in close to linear time!) with
+anything but fish or eel, or whatever it was your instructions said that
+particular time.
+
+One night when all the cooking is done, you fall for the temptation and open up
+the robot. You unscrew the front panel with the snazzy logo "Pamicho Groceries
+Engine" on it, and peer within, into near-total darkness.
+
+You only find a collection of beads in there, with names on them. You see blue
+beads and red beads and green beads. That certainly doesn't make you any wiser.
+Thinking that seeing the mechanism in action might help, you type in your
+usual rice-pasta-quinoa order on the keyboard:
+
+    <[ r p q ]>
+
+Things start moving in the dark! Sooner than you can blink, deft mechanical
+arms pick up a blue bead, whirl it around the innards of the machine, and
+finally hang it on a fine wire from the roof of the dark space inside. It looks
+like this:
+
+    EnumCharList{ ast => 'rpq' }
+
+Exclaiming "A-ha!" to the empty kitchen, you make a mental note as to the
+function of the blue beads. Seconds later, you have to manually overpower the
+machine, when it tries to leave the kitchen on its way to the market picking up
+either rice, pasta or quinoa. You put it back in its corner and flip a
+'dry-run' switch so that it won't attempt to leave again.
+
+You try another query:
+
+    <[a..m] - [fe]>
+
+Three beads leap into action: two blue ones and one red. When they settle
+down, suspended from the roof of the inside of the robot just like the last
+time, they hang from each other in a tree-like structure:
+
+    Concat
+    |
+    +--EnumCharList{ ast => 'fe', :isnegated, :iszerowidth }
+    |
+    +--EnumCharList{ ast => 'abcdefghijklm' }
+
+This time, you have to look for quite some time before it all sinks in.
+First off, you note that red beads ("Concat") seem to tie together the blue
+beads when the order consists of many parts. Also, it doesn't escape your
+attention that your order has been... reversed. Hm.
+
+And those new flags, C<:isnegated> and C<:iszerowidth>? You can sort of
+grok the first one, since the C<[fe]> part of the order really is negated
+(you I<don't> want the fish or the eel on this planet). The other one,
+however...
+
+A flash of vivid imagination strikes you. You picture the robot at the market,
+picking up a certain grocery item. It must now run two tests on this item,
+the first being "not fish or eel", and the second being "something in the
+range C<a..m>". It should do both of those tests on the I<same> item and not,
+say, the first test on one item and the second test on some other item. That
+could have disastrous consequences. You therefore decide, preliminarily,
+that C<:iszerowidth> means that it should hold onto the same grocery item,
+and not proceed to the next. Perhaps there's a "standard unit of grocery
+width" so that the robot knows how far to move to get to the next grocery,
+and this flag temporarily sets that width to zero. Yeah, that makes sense.
+
+The structure of beads now starts to appear as a sort of "operational
+procedure" for the robot. Each time it stops before a grocery item, it picks it
+up and inspects it according to rules given by the structure of beads. If it
+can get through all the beads, the machine knows it found something that it can
+take back home. For simple orders, one bead is enough. For the more complex
+ones, the robot puts together a whole structure of beads, crystalizing the
+textual input into globular data.
+
+Just for kicks, you decide to try another query. Still haven't managed to
+activate those green beads.
+
+    <[a..m] + [p..r]>
+
+Hah! This time, one green bead does the dance along with two blue ones.
+
+    Alt
+    |
+    +--EnumCharList{ ast => 'abcdefghijklm' }
+    |
+    +--EnumCharList{ ast => 'pqr' }
+
+This time, things are much simpler. There are no extra flags, the blue beads
+weren't reversed, and you seem to grasp the workings immediately. Obviously,
+"Alt" means "do either of these B<alt>ernatives". So, no mystery there.
+
+Being a very thorough person, you try a few last variations on the syntax.
+
+    <+[a..m]>
+
+That order causes one blue bead to spring into action and settle down.
+
+    EnumCharList{ ast => 'abcdefghijklm' }
+
+Simple as that. The C<+> at the beginning doesn't seem to matter much.
+
+What about this one?
+
+    <-[fe]>
+
+Several beads this time. One blue, one red, and... hey, where did that black
+bead come from? Guess you didn't see it until now, due to the darkness.
+
+    Concat
+    |
+    +--EnumCharList{ ast => 'fe', :isnegated, :iszerowidth }
+    |
+    +--CCShortcut{ ast => '.' }
+
+You stare at the new, black bead. What could it mean? It appears to you as
+the final, remaining mystery of the inner workings of the robot.
+
+Then you recall what the order C<< <-[fe]> >> means: "pick up absolutely *any*
+grocery, except fishes or eels". The black bead sits at the position of the
+positive check done by the robot. The black bead must be the "absolutely *any*"
+part of it. That fits.
+
+Totally contented with this foray into the robot, you screw back the panel
+with the PGE logo, flip the 'dry-run' switch, and tell the robot to go fetch
+some tasty grocery to celebrate. Anything but a fish or an eel.
+
+Life rocks in the future.
+
+=head1 Regex nodetypes, sitting in a tree...
+
+Ok; back to talking about regexes. The above story about a robot picking up
+groceries has, of course, nothing to do with regexes... except that its
+operation language seems eerily reminiscent of Perl 6 character classes. (As
+usual, S05 has the whole story.) And the "inner workings" of the robot have a
+lot to do with the inner workings of how the Parrot Grammar Engine converts the
+regex into an abstract syntax tree, which it then uses to go shopping for
+characters.
+
+We've seen a few new types of regex parts today. The C<EnumCharList> stands
+out as the core player. It represents a sort of "character class atom", the
+indivisible part with which to build more complicated structures. The
+C<EnumCharList> contains a list of characters, and it can be negated and
+have zero width. But all that is handled internally, under the hood.
+
+The C<CCShortcut> provides us with a simple way to talk about common character
+classes without listing all the constituent characters. We saw the C<.> above,
+which stands for "any character". Below you find a complete list of the
+character classes in Perl 6 regexes:
+
+    .       Any character
+    \w      Any letter, digit or underscore
+    \d      Any digit
+    \s      Any whitespace character
+    \h      Any horizontal whitespace character (space, tab, etc)
+    \v      Any vertical whitespace character (return, line feed, etc)
+    \e      The escape character (0x1B)
+    \f      The form feed character (0x0C)
+    \r      The line feed character (0x0D)
+    \t      The tab character (0x09)
+
+Apart from the dot, every shortcut also has an upper-case counterpart, which
+means "anything but". Thus, you'd use C<\S> to mean "anything but a whitespace
+character", for example.
+
+The C<Concat> is a way to sequence parts of a regex. In the more common use
+case it strings together the several parts of a regex into one single abstract
+syntax tree. C<Concat> then works as the glue that unites the whole expression,
+and the grammar engine makes sure to execute the bits in the order given. But
+in character classes we sort of hijack the functionality of C<Concat> a bit,
+checking the same character twice by switching on the C<:iszerowidth> flag on
+an C<EnumCharList>.
+
+The C<Alt> has a similar background. We'll cover its actual use more in the
+next installment. In short, it does alternations, making C<foo | bar> match
+either C<foo> or C<bar>. Natually, it's a perfect stand-in for what the
+C<+> means in character classes.
+
+=head1 ...P-A-R-S-I-N-G
+
+Last time, when we dealt with literals and anchors, the match results that
+interested us consisted of a 'yes' or a 'no'. We could also have been
+interested in the actual position of the match. But it wouldn't have made
+any sense to go to that position in the string and see what we got back,
+because neither literals or anchors allow for any degrees of freedom.
+Character classes, however, allow for degrees of freedom, by design. Just
+as a futuristic chef somewhere on another planet might have some slight
+interest in what grocery the robot arrived back with, we might have some
+slight interest not only in the position of a possible match, but the
+actual substring that matched at that position.
+
+Now, one could provide such a substring by doing the actual copying of the
+substring in question, allocating new memory for it and so on. I<Or> one
+could provide (a reference to) the original string, together with information
+saying "our match started I<here> and ended I<here>". Thus removing one string
+allocation for every time we find a match.
+
+Whereas in the last installment we might have contented ourselves with
+returning a boolean answer ("did the regex match the target string?"), or
+maybe an integer answer ("at what position did match occur?"), it now sounds
+more like we want to return a bundle of information, something of a
+I<match object>, perhaps, describing the C<target> string, along with C<to>
+and C<from> positions delineating the match. As we shall see in part 4, the
+match object will also quite naturally play host to captured submatches.
+
+I hope you enjoyed your anything-but-fish-or-eel. See you in part 3.
