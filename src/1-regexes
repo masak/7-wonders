@@ -26,30 +26,33 @@ C<We define a DSL as a restricted syntax and semantics for solving a specific
 class of tasks more conveniently than a general-purpose language would.>
 
 Perl has a history of successfully mixing DSLs into its main dialect. We
-hardly notice their presence: transliteration, file globs, POD, various
-quoting environments (including here-docs, C<qw> lists and shell quotes)...
-rather than staying isolated from the surrounding program they often weave
-into it, both accepting values and passing them back. We get many languages
-for the price of one. We get socially encouraged multilingualism. We get a
-TIMTOWTDI toolbox of honed solutions.
+hardly notice ourselves slipping into and out of them: transliteration, file
+globs, POD, various quoting environments (including here-docs, C<qw> lists and
+shell quotes)... Rather than staying isolated from the surrounding program,
+they often weave into it, both accepting values from the larger program and
+passing them back out. We get many languages for the price of one. We get
+socially encouraged multilingualism. We get a TIMTOWTDI toolbox of solutions,
+each precesely honed for a purpose.
 
 (Perl 5 tries valiantly to Do What You Mean with respect to these nested
-languages, only occasionally getting it wrong. Perl 6 formalizes the notion,
-and defines the DSLs as being I<slangs>, short for "sublanguages", which weave
-together into a I<braid> to make up your standard Perl 6. This may sound fairly
-spaced out, but in practice it means that Perl 6 won't have to have a section
-in its C<perldoc> called "Gory details of parsing quoted constructs". There
-will still be gory details, for sure, but the gore will be much more evenly
-spread out.)
+languages, only occasionally getting it wrong (pro tip: don't put a slash into
+the comment of a C</x> regex delimited by slashes). Perl 6 formalizes the
+notion, and defines the DSLs as being I<slangs>, short for "sublanguages",
+which weave together into a I<braid> to make up your standard Perl 6. This may
+sound really spaced out, but in practice it means that Perl 6 won't have to
+have a section in its C<perldoc> called "Gory details of parsing quoted
+constructs". There will still be gory details, for sure, but Perl 6 strives to
+spread out the gore more evenly, and reserve the traps and pitfalls for really
+intrepid people.)
 
 =head1 Enter... the regex
 
 I've yet to mention the most-used and most-famous DSL of Perl: the regex
 language. It makes for a very natural way to talk about strings, parts of
-strings, and modifications to strings.
+strings, and ways in which one might like to modify strings.
 
   if $kitchen ~~ /rat/ {
-      say "I have a rat in my kitchen!";
+      say "Oh dear. I have a rat in my kitchen!";
   }
 
 Now, picture for a moment a world without regexes. We could still solve the
@@ -59,17 +62,19 @@ instead:
   # RAKUDO: Since Rakudo's Str.index method returns Int values rather than
   #         the intended StrPos values, the 'defined' prevents false negatives
   #         in the form of substring matches at position 0. In a more
-  #         conformant Perl 6 implementation, we won't need it.
+  #         conformant Perl 6 implementation, we wouldn't need it.
   if defined $kitchen.index('rat') {
-    say "I have a rat in my kitchen!";
+    say "Oh dear. I have a rat in my kitchen!";
   }
 
-Probably the optimizer should do such a substitution under the hood. We're
-hardly using the regex engine at all in this case.
+Arguably, the optimizer should do such a substitution under the hood. In this
+particular case, we don't use the regex engine enough for it to feel
+indispensible to us.
 
-But wait! We notice, to our dismay, that we can't pull out the C<cheese grater>
-from the cupboards without the above conditions triggering. Not really what we
-had in mind. We actually meant something like this:
+But wait! We notice, to our dismay, that we can't pull out the C<cheese
+gB<rat>er> from the cupboards without the above conditions triggering.
+Honestly, we didn't really have such false positives in mind when we crafted
+our regex. We actually meant something like this:
 
   if $kitchen ~~ / << rat >> / {
       say "I have a rat in my kitchen!";
@@ -85,6 +90,9 @@ Let's see...
 
   sub non-word($char) { $char ne any('a'..'z', 'A'..'Z', 0..9, '_') }
   my $matched = False;
+  # You might not have seen the ^$foo style of ranges before. It's short for
+  # 0 ..^ $foo, which in this case means 0 .. $foo-1. A nice way of looping
+  # up to (but not including) $foo.
   for ^($kitchen.chars - 'rat'.chars + 1) -> $pos {
       # Check word boundary to the left
       next unless $pos == 0 || non-word($kitchen.substr($pos - 1, 1));
@@ -104,23 +112,23 @@ I mostly give this example to show exactly what I mean by 'solving a specific
 class of tasks more conveniently than a general-purpose language would'. Look
 how much poorer the world becomes when we don't let ourselves use regexes!
 Steve Yegge tells about job interviews he's sat in on where people concoct
-elaborate loops like the one above, when one or a couple of well-placed
-regexes would've sufficed.
+elaborate loops like the one above, essentially going on for hundreds of lines,
+when one or a couple of well-placed regexes would've sufficed.
 
 (The subroutine C<&non-word> misses the mark slightly by not considering
 Unicode alphanumerics, as Perl 6 regexes do by default. I leave adapting it to
 Unicode as a cruel exercise to any reader who still doesn't agree that regexes
-help keep code brief.)
+can help keep code brief.)
 
 =head1 A compiler for regexes
 
 The Parrot Grammar Engine (PGE), the piece of software I will describe in this
-series, takes a regex and compiles it down to primitive operations such as the
-above ones. The output language is PIR, a sugared-up assembly language for the
+series, takes a regex and compiles it down to the kind of primitive operations
+seen above. The output language is PIR, a sugared-up assembly language for the
 Parrot virtual machine. But it might as well have been Perl 6 or some
 machine-specific assembly language; the point is that PGE satisfies the
 definition of a I<compiler>: something that takes as input a program in one
-language, and emits the same program in another language. Regexes are
+language, and emits the same program in another language. Regexes qualify as
 programs; quite specialized, DSL-y ones, but still programs.
 
 Many of the constructs that we recognize from imperative programming, we also
@@ -128,11 +136,10 @@ find represented in regexes. We have if statements, through the C<?>
 quantifier; we have loops through the C<*> and C<+> and C<**>
 quantifiers. Variables and assignments figure in regexes; Perl 6 even
 introduces sub and method calls with its C<< <other-regex> >> syntax. But
-there one major difference sets regexes apart from ordinary imperative
-programming, and from all the I<other> DSLs in Perl: regexes give up all the
-time.
+one major difference sets regexes apart from ordinary imperative programming,
+and from all the I<other> DSLs in Perl: regexes give up. All the time.
 
-Notice the three occurrences of C<next unless> in the code above? Those are
+Notice the three occurrences of C<next unless> in the above code? Those are
 short for saying "if what we find here doesn't live up to the pattern against
 which we're trying to match, give up immediately and start from the beginning
 somewhere else". This happens every time we want to match a piece of a regex
@@ -140,15 +147,17 @@ against a piece of a string; in the general case, there's no sense in
 continuing when something fails to match.
 
 Regexes give up all the time. The I<syntax> of regexes takes this realization,
-and hides it away in the gaps between stuff. The giving-up becomes abstracted
-away; while still there, it's now invisible. Which is one reason regexes are a
-good fit for matching strings: we don't have to keep saying "if I<that> failed,
-might as well give up now". The syntax builds it into itself.
+and hides it away in the little cracks between terms, in the gaps between
+stuff. The giving-up becomes abstracted away; the syntax implies it, but makes
+it conveniently invisible. Which forms one reason why regexes make a good fit
+for matching strings: we don't have to keep saying "if I<that> failed, might as
+well give up now". The syntax folds it into itself.
 
 Just describing regexes as "giving up all the time" is slightly unfair,
-though. In part 3 of this series we'll recognize the truth, as is often the
-case, as slightly more complex. Before giving up, regexes perform a magical
-dance called "backtracking"... but more about that later.
+though. In part 3 of this series we'll start to suspect that the truth, as is
+often the case, weaves a thicker and richer tapestry. Before giving up, regexes
+perform a desperate but beautiful dance called "backtracking"... but more about
+that later.
 
 I'll be introducing the full arsenal of regular expression components
 gradually through the series. This time around we've already seen I<literals>
@@ -157,8 +166,8 @@ assertions about the current position in the target string). I don't plan to
 regurgitate all of S05, but here follows a short summary of these two
 components.
 
-A literal is either made up of alphanumerics (such as C<rat> or C<C3P0> or
-C<underscores_are_alphanumerics_srsly>), or, if they're not, you should
+A literal either consists of alphanumerics (such as C<rat> or C<C3P0> or
+C<underscores_are_alphanumerics_srsly>), or, if they do not, you should
 consider quoting them using single quotes (such as C<'o.O'> or C<'OH HAI!'> or
 C<'.*'>). As an equivalent alternative to quoting, you may prefix your
 non-alphanumerics with a backslash (making C<o\.O>, C<OH\ HAI\!> and C<\.\*>,
@@ -168,10 +177,11 @@ The general rule is that alphanumerics are literal by default, whereas
 non-alphanumerics are magical (actually, the professional term is
 'metasyntactical'... which means 'magical'). Prefixing with a backslash turns
 literal things into magical things, and vice versa. Not all magical things have
-a default meaning. (C<\b> does, but C<\_> doesn't, for example.)
+a default meaning. (C<\w> does, but C<\_> doesn't, for example.)
 
-We've already seen the anchor C<\b> for "word boundary". Here's a complete
-list of the types of anchor in Perl 6 regexes:
+We've already seen the anchors C<<< << >>> for "left word boundary" and C<<< >>
+>>> for "right word boundary". Here follows a complete list of the types of
+anchor in Perl 6 regexes:
 
   ^           start of string
   $           end of string

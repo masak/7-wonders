@@ -19,23 +19,23 @@ The C<profession> field of your ID holocard says 'cook'; even in the future,
 people prefer to combine fine ingredients into splendid taste sensations,
 or to employ a person who does it for them. One can't really trust a robot
 with the minute culinary decisions involved in preparing an unforgettable meal.
-So you keep telling yourself, anyway.
+At least, so you keep telling yourself.
 
-You do have the most advanced machinery on the market to help you in the
-kitchen, of course. Including, as it happens, a robot. One can't really
-avoid having one, the atmosphere being toxic and all. The robot takes care
-of doing tasks that require going outside, such as acquiring ingredients.
-Ingredients form a vital part of cooking.
+You do, however, have the most advanced machinery on the market to help you in
+the kitchen. Including, as it happens, a robot. One can't really avoid having
+one, the outdoor atmosphere being toxic and all. The robot takes care of doing
+tasks that require going outside, such as acquiring ingredients. Ingredients
+form a vital part of cooking.
 
 The robot accepts input through a keyboard. (In this futuristic scenario,
 researchers gave up on speech recognition, because the state-of-the-art
 technology never evolved beyond the ability to distinguish between such words
 as "talk", "took", "torque", "Turk" and "toke"; in the end, the researchers
-couldn't determine whether they had simply set their goals too high to begin
-with, or whether the machines just felt like messing with them. So keyboards
-remained the dominant technology.) One enters the instructions for which
-groceries to pick up through a very specialized "Delivery-Specific Language",
-one which you at one point spent a three-day course mastering. It looks like
+couldn't determine whether they had simply set the bar too high from the start,
+or whether the machines just felt like messing with them. So keyboards remained
+the dominant technology.) One enters the instructions for which groceries to
+pick up through a very specialized "Delivery-Specific Language", one which you
+at one point spent a three-day course in chef's school mastering. It looks like
 this:
 
     <[ r p q ]>
@@ -51,21 +51,22 @@ written the above instruction as:
 
     <[ p..r ]>
 
-(Since C<p>, C<q> and C<r> follow each other alphabetically.) Or, say you
+(Since C<p>, C<q> and C<r> follow each other alphabetically.) Or, maybe you
 just wanted to buy something in the C<a..m> range, I<except> for fish or
 eels, which also happen to be toxic (to humans) on this planet:
 
     <[a..m] - [fe]>
 
 The robot obliges and comes back with any of the groceries in the C<a..m>
-range, but it makes sure not to pick a fish or an eel. In fact, if your only
-concern is not getting the fish or the eel (as they carefully explained in
-the three-day course), you can give the following instruction to the robot:
+range (whichever it finds first at the market), but it makes sure not to pick a
+fish or an eel. In fact, if your only concern is not getting the fish or the
+eel (as they carefully explained in the three-day course), you can give the
+following instruction to the robot:
 
     <-[fe]>
 
 In English, that means "pick up absolutely *any* grocery, except fishes or
-eels".
+eels". Ah, the fun you had with this function in the three-day course!
 
 Conversely, if you want to specify a larger number of inclusions and
 exclusions, that's fine too:
@@ -79,27 +80,30 @@ it -- though it doesn't add anything semantically:
 
 Thus works your groceries robot. To be honest, you've always felt a little
 bit of roboticist in you, and more than once have you wondered at the workings
-below that shiny panel, thought about what structures must exist inside the
-mechanical assistant in order for it to do its job: go to the market with
-your coded instructions, and arrive back (in close to linear time!) with
-anything but fish or eel, or whatever it was your instructions said that
-particular time.
+below that shiny panel, and thought about what structures must exist inside the
+mechanical assistant in order for it to do its job: go to the market with your
+coded instructions, and arrive back (in close to linear time!) with anything
+but fish or eel, or whatever it was your instructions said that particular
+time.
 
-One night when all the cooking is done, you fall for the temptation and open up
-the robot. You unscrew the front panel with the snazzy logo "Pamicho Groceries
-Engine" on it, and peer within, into near-total darkness.
+=head1 Voiding the warranty
 
-You only find a collection of beads in there, with names on them. You see blue
-beads and red beads and green beads. That certainly doesn't make you any wiser.
-Thinking that seeing the mechanism in action might help, you type in your
-usual rice-pasta-quinoa order on the keyboard:
+One evening when the kitchen has closed for the day, you fall for the
+temptation and open up the robot. You unscrew the front panel with the snazzy
+logo "Patikmeesho Groceries Engine" on it, and peer within, into near-total
+darkness.
+
+You only find a collection of beads in there, stacked into neat boxes and with
+names on them. You see blue beads and red beads and green beads. That certainly
+doesn't make you any wiser.  Thinking that seeing the mechanism in action might
+help, you type in your usual rice-pasta-quinoa order on the keyboard:
 
     <[ r p q ]>
 
-Things start moving in the dark! Sooner than you can blink, deft mechanical
-arms pick up a blue bead, whirl it around the innards of the machine, and
-finally hang it on a fine wire from the roof of the dark space inside. It looks
-like this:
+Things start moving in the dark insides of the droid! Sooner than you can
+blink, deft mechanical arms have picked up a blue bead, whirled it around the
+innards of the machine, and finally hung it on a fine wire from the roof of the
+dark space inside. It looks like this:
 
     EnumCharList{ ast => 'rpq' }
 
@@ -107,7 +111,7 @@ Exclaiming "A-ha!" to the empty kitchen, you make a mental note as to the
 function of the blue beads. Seconds later, you have to manually overpower the
 machine, when it tries to leave the kitchen on its way to the market picking up
 either rice, pasta or quinoa. You put it back in its corner and flip a
-'dry-run' switch so that it won't attempt to leave again.
+'dry-run' switch so that the bot won't attempt to leave again.
 
 You try another query:
 
@@ -130,7 +134,7 @@ attention that your order has been... reversed. Hm.
 
 And those new flags, C<:isnegated> and C<:iszerowidth>? You can sort of
 grok the first one, since the C<[fe]> part of the order really is negated
-(you I<don't> want the fish or the eel on this planet). The other one,
+(you really I<don't> want the fish or the eel on this planet). The other one,
 however...
 
 A flash of vivid imagination strikes you. You picture the robot at the market,
@@ -138,19 +142,20 @@ picking up a certain grocery item. It must now run two tests on this item,
 the first being "not fish or eel", and the second being "something in the
 range C<a..m>". It should do both of those tests on the I<same> item and not,
 say, the first test on one item and the second test on some other item. That
-could have disastrous consequences. You therefore decide, preliminarily,
-that C<:iszerowidth> means that it should hold onto the same grocery item,
-and not proceed to the next. Perhaps there's a "standard unit of grocery
-width" so that the robot knows how far to move to get to the next grocery,
-and this flag temporarily sets that width to zero. Yeah, that makes sense.
+could have disastrous and confusing, not to mention erroneous, consequences.
+You therefore decide, preliminarily, that C<:iszerowidth> means that it should
+hold onto the same grocery item, and not proceed to the next. Perhaps there's a
+"standard unit of grocery width" so that the robot knows how far to move to get
+to the next grocery, and this flag temporarily sets that width to zero. Yeah,
+that makes sense.
 
 The structure of beads now starts to appear as a sort of "operational
 procedure" for the robot. Each time it stops before a grocery item, it picks it
 up and inspects it according to rules given by the structure of beads. If it
 can get through all the beads, the machine knows it found something that it can
 take back home. For simple orders, one bead is enough. For the more complex
-ones, the robot puts together a whole structure of beads, crystalizing the
-textual input into globular data.
+ones, the robot puts together a whole tree of beads, crystalizing the textual
+input into globular chunks of data.
 
 Just for kicks, you decide to try another query. Still haven't managed to
 activate those green beads.
@@ -193,12 +198,12 @@ bead come from? Guess you didn't see it until now, due to the darkness.
     +--CCShortcut{ ast => '.' }
 
 You stare at the new, black bead. What could it mean? It appears to you as
-the final, remaining mystery of the inner workings of the robot.
+the final, remaining mystery of the inner workings of the groceries robot.
 
-Then you recall what the order C<< <-[fe]> >> means: "pick up absolutely *any*
+Then you recall what the order C<< <-[fe]> >> means: "pick up absolutely B<any>
 grocery, except fishes or eels". The black bead sits at the position of the
-positive check done by the robot. The black bead must be the "absolutely *any*"
-part of it. That fits.
+positive check done by the robot, the things it I<should> accept. The black
+bead must be the "absolutely B<any>" part of it. That fits.
 
 Totally contented with this foray into the robot, you screw back the panel
 with the PGE logo, flip the 'dry-run' switch, and tell the robot to go fetch
@@ -220,7 +225,8 @@ We've seen a few new types of regex parts today. The C<EnumCharList> stands
 out as the core player. It represents a sort of "character class atom", the
 indivisible part with which to build more complicated structures. The
 C<EnumCharList> contains a list of characters, and it can be negated and
-have zero width. But all that is handled internally, under the hood.
+have zero width. But all that is handled internally, under the regex engine's
+hood.
 
 The C<CCShortcut> provides us with a simple way to talk about common character
 classes without listing all the constituent characters. We saw the C<.> above,
@@ -244,29 +250,33 @@ character", for example.
 
 The C<Concat> is a way to sequence parts of a regex. In the more common use
 case it strings together the several parts of a regex into one single abstract
-syntax tree. C<Concat> then works as the glue that unites the whole expression,
+syntax tree. C</ foo bar baz /> would parse down into a C<Concat> of three
+literals. C<Concat> then works as the glue that unites the whole expression,
 and the grammar engine makes sure to execute the bits in the order given. But
 in character classes we sort of hijack the functionality of C<Concat> a bit,
 checking the same character twice by switching on the C<:iszerowidth> flag on
 an C<EnumCharList>.
 
 The C<Alt> has a similar background. We'll cover its actual use more in the
-next installment. In short, it does alternations, making C<foo | bar> match
-either C<foo> or C<bar>. Natually, it's a perfect stand-in for what the
-C<+> means in character classes.
+next installment. In short, it does alternations, making C</ foo | bar /> match
+either C<foo> or C<bar>. Natually, it's a perfect stand-in for what the C<+>
+means in character classes.
 
 =head1 ...P-A-R-S-I-N-G
 
 Last time, when we dealt with literals and anchors, the match results that
 interested us consisted of a 'yes' or a 'no'. We could also have been
 interested in the actual position of the match. But it wouldn't have made
-any sense to go to that position in the string and see what we got back,
-because neither literals or anchors allow for any degrees of freedom.
-Character classes, however, allow for degrees of freedom, by design. Just
-as a futuristic chef somewhere on another planet might have some slight
-interest in what grocery the robot arrived back with, we might have some
-slight interest not only in the position of a possible match, but the
-actual substring that matched at that position.
+much sense to go to that position in the string and see what we got back,
+because neither literals or anchors carry around any degrees of freedom.
+(Literals "just" represent themselves, i.e. one possible match, and anchors
+"just" talk about the gaps between characters and their properties.)
+
+Character classes, by design, allow for degrees of freedom. Just as a
+futuristic chef somewhere on another planet might have some slight interest in
+what grocery the robot arrived back with, we might have some slight interest
+not only in the position of a possible match, but the actual substring that
+matched at that position.
 
 Now, one could provide such a substring by doing the actual copying of the
 substring in question, allocating new memory for it and so on. I<Or> one
@@ -277,9 +287,9 @@ allocation for every time we find a match.
 Whereas in the last installment we might have contented ourselves with
 returning a boolean answer ("did the regex match the target string?"), or
 maybe an integer answer ("at what position did match occur?"), it now sounds
-more like we want to return a bundle of information, something of a
-I<match object>, perhaps, describing the C<target> string, along with C<to>
-and C<from> positions delineating the match. As we shall see in part 4, the
-match object will also quite naturally play host to captured submatches.
+more like we want to return a small bundle of information, something of a
+I<match object>, perhaps, describing the C<target> string, along with C<from>
+and C<to> positions delineating the match. As we shall see in part 4, the match
+object will also quite naturally play host to captured submatches.
 
 I hope you enjoyed your anything-but-fish-or-eel. See you in part 3.
