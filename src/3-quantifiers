@@ -9,3 +9,38 @@ are a source of debate: the eleventh-century Byzantine historian Georgios
 Kedrenos recorded the tradition that it was carried off to Constantinople,
 where it was destroyed in the great fire of the Lauseion, in AD 475. Others
 argue that it perished with the temple when it burned in 425.
+
+=head0 Alternatives and repetitions
+
+=head1 Quantifier mechanics
+
+When I think about regexes, I tend to think first about those little stars,
+plusses, and question marks that help some part of a regex to match some non-1
+number of times. In many ways, these special constructs (called I<quantifiers>
+by experienced regexeers) contain the expressive power that make us reach for
+a regex in the first place.
+
+Just to refresh our memory: we'd use a C<+> when we want to match one or more
+occurrences of something:
+
+    / ^  f o+ $ /  # matches fo, foo, fooo, foooo etc
+    / ^ 'fo'+ $ /  # matches fo, fofo, fofofo etc
+
+(Note how the quotes introduced in part 1, besides allowing non-alphanumeric
+characters, also cause the thing quoted to behave as one "unit" in the eyes of
+a quantifier that follows it. Without the quotes, only a single character will
+be treated as a unit of repetition. The whitespace between the C<f> and the
+C<o> in the first regex has no significance, and specifically does I<not>
+affect whether the quantifier treats C<o> as a unit or not.)
+
+Similarly, we'd use C<*> when we want to match I<zero> or more repetitions:
+
+    / ^ \d* $ /    # matches the empty string, one digit, two digits etc
+    / ^ 'ah '* 'choo!' $ /    # a sneeze with or without some 'ah's before it
+
+And finally, we'd use C<?> for optional items, i.e. zero or one occurrence:
+
+    / ^ gazelles? $ /         # matches 'gazelle' or 'gazelles'
+    / ^ 'gazelle' 's'? $ /    # same thing
+    rx:g/ '<' '/'? 'ol>' /    # finds all '<ol>' and '</ol>' in a string
+

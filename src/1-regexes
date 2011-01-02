@@ -146,6 +146,15 @@ somewhere else". This happens every time we want to match a piece of a regex
 against a piece of a string; in the general case, there's no sense in
 continuing when something fails to match.
 
+Perl already has an idiom for this. We're used to seeing actions chained
+together with C<&&>:
+
+  try_foo() && try_bar() && try_something_awesome();
+
+In code such as the above, the C<&&> operators can be read as "and if that
+succeeds, then...". Conversely, if an earlier action fails, we don't proceed
+to later actions.
+
 Regexes give up all the time. The I<syntax> of regexes takes this realization,
 and hides it away in the little cracks between terms, in the gaps between
 stuff. The giving-up becomes abstracted away; the syntax implies it, but makes
