@@ -82,8 +82,8 @@ our regex. We actually meant something like this:
 
 (The C<<< << >>> and C<<< >> >>> indicate word boundaries, in case you wonder.
 Oh, and in Perl 6 regexes, which I'll use throughout the series, ordinary
-whitespace carries no significe. Think C</x> flag à la Perl 5, but without the
-C</x> flag.)
+whitespace carries no significance. Think C</x> flag à la Perl 5, but without
+the C</x> flag.)
 
 Right... what primitive operations would correspond to the above regex?
 Let's see...
